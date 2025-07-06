@@ -87,7 +87,7 @@ AI Model or Logic (Custom Rules / LLMs)
 | Frontend | HTML, CSS, JavaScript                     |
 | Styling  | Custom CSS (no frameworks)                |
 | Backend  | Flask / Django / FastAPI                  |
-| AI Logic | Rule-based or LLM (ChatGPT, Gemini, etc.) |
+| AI Logic | Rule-based or LLM (ChatGPT, Gemini, EURI, etc.) |
 | Export   | Blob + `download()` for TXT/PDF           |
 | UI/UX    | Responsive, Accessible Design             |
 
@@ -142,7 +142,7 @@ python app.py
 
 ## 💡 Future Enhancements
 
-* 🧠 AI model integration (OpenAI/Gemini API.EURI)
+* 🧠 AI model integration (OpenAI/Gemini API/EURI)
 * 🧾 Save user session history
 * 📊 Admin dashboard for tracking queries
 * 💬 Chatbot-style interaction history
