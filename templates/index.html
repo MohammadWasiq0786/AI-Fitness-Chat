@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Diet & Workout Chat</title>
+  <style>
+    :root {
+      --bg-light: #fefefe;
+      --bg-dark: #1e1e1e;
+      --text-light: #333;
+      --text-dark: #fefefe;
+      --card-bg-light: #ffffff;
+      --card-bg-dark: #2c2c2c;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark-mode {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: var(--card-bg-light);
+      padding: 80px;
+      border-radius: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s;
+      margin: 80px auto 80px auto;
+    }
+
+    body.dark-mode .container {
+      background: var(--card-bg-dark);
+    }
+
+    .header-card {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #2196f3;
+      color: white;
+      padding: 25px;
+      text-align: center;
+      font-size: 30px;
+      font-weight: 600;
+      z-index: 998;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    label {
+      display: block;
+      margin-top: 16px;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 12px 20px;
+      border: 1px solid #ccc;
+      margin: 12px 0 20px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    textarea {
+      height: 60px;
+    }
+
+    button[type="submit"], .download-btn {
+      display: inline-block;
+      margin: 20px 10px 0;
+      background: linear-gradient(135deg, #42a5f5, #1e88e5);
+      color: white;
+      padding: 10px 20px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button[type="submit"]:hover, .download-btn:hover {
+      background: linear-gradient(135deg, #1e88e5, #1565c0);
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 999;
+    }
+
+    .output-box {
+      width: 100%;
+      max-width: 700px;
+      background: var(--card-bg-light);
+      padding: 20px;
+      margin: 20px auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s;
+    }
+
+    body.dark-mode .output-box {
+      background: var(--card-bg-dark);
+    }
+
+    .output-box h3 {
+      margin-bottom: 16px;
+      color: #2196f3;
+    }
+
+    .output-box ol {
+      padding-left: 20px;
+    }
+
+    .output-box li {
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    .output-box li strong {
+      color: #4caf50;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      padding: 10px;
+      background: #2c3e50;
+      color: white;
+      z-index: 997;
+      font-size: 13px;
+      border-radius: 12px 12px 0 0;
+    }
+
+    footer a {
+      color: #ffd700;
+      text-decoration: none;
+      margin: 0 4px;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .loader {
+      display: none;
+      width: 50px;
+      height: 50px;
+      margin: 20px auto;
+      border-radius: 50%;
+      border: 6px solid #eee;
+      border-top: 6px solid #42a5f5;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="theme-toggle">
+    <button onclick="toggleTheme()">🌗</button>
+  </div>
+
+  <div class="header-card">
+    💬 AI Fitness Chat Assistant
+  </div>
+
+  <div class="container">
+    <form id="plannerForm" action="/recommendations" method="POST">
+      <label>Dietary Preferences:</label>
+      <input type="text" name="dietary_preferences" required>
+
+      <label>Fitness Goals:</label>
+      <input type="text" name="fitness_goals" required>
+
+      <label>Lifestyle Factors:</label>
+      <input type="text" name="lifestyle_factors" required>
+
+      <label>Dietary Restrictions:</label>
+      <input type="text" name="dietary_restrictions" required>
+
+      <label>Health Conditions:</label>
+      <input type="text" name="health_conditions" required>
+
+      <label>Your Query:</label>
+      <textarea name="user_query" required></textarea>
+
+      <div class="loader" id="loader"></div>
+      <button type="submit">🚀 Get AI Plan</button>
+    </form>
+  </div>
+
+  {% if recommendations %}
+  <div class="output-box">
+    <h3>📋 Personalized Recommendations</h3>
+    <div class="output-section">
+      <h4>🥗 Diet Recommendations</h4>
+      <ul>
+        {% for item in recommendations.diet_types %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+
+      <h4>🏋️ Workout Options</h4>
+      <ul>
+        {% for item in recommendations.workouts %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+
+      <h4>🍳 Breakfast Ideas</h4>
+      <ul>
+        {% for item in recommendations.breakfasts %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+
+      <h4>🍽️ Dinner Options</h4>
+      <ul>
+        {% for item in recommendations.dinners %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+
+      <h4>💡 Additional Tips</h4>
+      <ul>
+        {% for item in recommendations.additional_tips %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+
+      <div style="text-align: center; margin-top: 20px;">
+        <button class="download-btn" onclick="downloadPDF()">📄 Download PDF</button>
+        <button class="download-btn" onclick="downloadTXT()">📝 Download TXT</button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <footer>
+    Made with ❤️ by Mohammad Wasiq © 2025 All rights reserved. 
+   
+  </footer>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    function getTextFromSection(headerText) {
+      const header = Array.from(document.querySelectorAll("h4"))
+        .find(h => h.textContent.includes(headerText));
+      if (!header) return "";
+      const ul = header.nextElementSibling;
+      const items = Array.from(ul.querySelectorAll("li")).map(li => li.textContent);
+      return `\n${headerText}:\n` + items.map((t, i) => `${i + 1}. ${t}`).join("\n");
+    }
+
+    function downloadPDF() {
+      const sections = [
+        getTextFromSection("Diet Recommendations"),
+        getTextFromSection("Workout Options"),
+        getTextFromSection("Breakfast Ideas"),
+        getTextFromSection("Dinner Options"),
+        getTextFromSection("Additional Tips"),
+      ];
+      const content = "📋 AI Personalized Plan\n" + sections.join("\n\n");
+      const blob = new Blob([content], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "AI_Fitness_Recommendations.pdf";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadTXT() {
+      const sections = [
+        getTextFromSection("Diet Recommendations"),
+        getTextFromSection("Workout Options"),
+        getTextFromSection("Breakfast Ideas"),
+        getTextFromSection("Dinner Options"),
+        getTextFromSection("Additional Tips"),
+      ];
+      const content = "📋 AI Personalized Plan\n" + sections.join("\n\n");
+      const blob = new Blob([content], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "AI_Fitness_Recommendations.txt";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

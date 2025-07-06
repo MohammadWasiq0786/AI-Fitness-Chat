@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personalized Diet & Workout Planner</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #d0e7ff, #fef6e4);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      max-width: 700px;
+      background: white;
+      margin: 30px auto;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      color: #2196f3;
+      text-align: center;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 12px;
+      display: block;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    button {
+      background-color: #2196f3;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #0b7dda;
+    }
+
+    .result-buttons {
+      display: flex;
+      flex-direction: column;
+      margin-top: 20px;
+    }
+
+    .result-buttons button {
+      background-color: #4caf50;
+      margin-bottom: 10px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: black;
+    }
+
+    ul {
+      list-style-type: disc;
+      padding-left: 20px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #2c3e50;
+      color: white;
+      margin-top: auto;
+    }
+
+    footer a {
+      color: #ffd700;
+      margin: 0 10px;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Personalized Diet & Workout Planner</h2>
+    <form action="/recommendations" method="POST">
+      <label>Dietary Preferences:</label>
+      <input type="text" name="dietary_preferences" placeholder="e.g., vegetarian, high-protein" required>
+
+      <label>Fitness Goals:</label>
+      <input type="text" name="fitness_goals" placeholder="e.g., weight loss, muscle gain" required>
+
+      <label>Lifestyle Factors:</label>
+      <input type="text" name="lifestyle_factors" placeholder="e.g., active, sedentary" required>
+
+      <label>Dietary Restrictions:</label>
+      <input type="text" name="dietary_restrictions" placeholder="e.g., gluten-free, lactose-intolerant" required>
+
+      <label>Health Conditions:</label>
+      <input type="text" name="health_conditions" placeholder="e.g., diabetes, high blood pressure" required>
+
+      <label>Your Query:</label>
+      <textarea name="user_query" placeholder="Describe your goal briefly" required></textarea>
+
+      <button type="submit">Get Recommendations</button>
+    </form>
+  </div>
+
+  <div class="container">
+    {% if recommendations %}
+    <h2>Your Recommendations</h2>
+    <div class="result-buttons">
+      <button onclick="showModal('dietModal')">View Diet Types</button>
+      <button onclick="showModal('workoutModal')">View Workout Options</button>
+      <button onclick="showModal('breakfastModal')">View Breakfast Ideas</button>
+      <button onclick="showModal('dinnerModal')">View Dinner Options</button>
+      <button onclick="showModal('tipsModal')">View Additional Tips</button>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Modals -->
+  <div id="dietModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('dietModal')">&times;</span>
+      <h3>Diet Types</h3>
+      <ul>
+        {% for diet in recommendations.diet_types %}
+          <li>{{ diet }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div id="workoutModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('workoutModal')">&times;</span>
+      <h3>Workout Options</h3>
+      <ul>
+        {% for workout in recommendations.workouts %}
+          <li>{{ workout }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div id="breakfastModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('breakfastModal')">&times;</span>
+      <h3>Breakfast Ideas</h3>
+      <ul>
+        {% for breakfast in recommendations.breakfasts %}
+          <li>{{ breakfast }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div id="dinnerModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('dinnerModal')">&times;</span>
+      <h3>Dinner Options</h3>
+      <ul>
+        {% for dinner in recommendations.dinners %}
+          <li>{{ dinner }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div id="tipsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('tipsModal')">&times;</span>
+      <h3>Additional Tips</h3>
+      <ul>
+        {% for tip in recommendations.additional_tips %}
+          <li>{{ tip }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>Made with ❤️ by GenAI</p>
+    <p>
+      <a href="https://github.com" target="_blank">GitHub</a> |
+      <a href="https://twitter.com" target="_blank">Twitter</a> |
+      <a href="https://linkedin.com" target="_blank">LinkedIn</a>
+    </p>
+  </footer>
+
+  <script>
+    function showModal(modalId) {
+      document.getElementById(modalId).style.display = "block";
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      const modals = document.getElementsByClassName("modal");
+      for (let i = 0; i < modals.length; i++) {
+        if (event.target == modals[i]) {
+          modals[i].style.display = "none";
+        }
+      }
+    };
+  </script>
+</body>
+</html>

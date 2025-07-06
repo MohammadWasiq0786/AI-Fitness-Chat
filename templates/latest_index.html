@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Diet & Workout Chat</title>
+  <style>
+    :root {
+      --bg-light: #fefefe;
+      --bg-dark: #1e1e1e;
+      --text-light: #333;
+      --text-dark: #fefefe;
+      --card-bg-light: #ffffff;
+      --card-bg-dark: #2c2c2c;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark-mode {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: var(--card-bg-light);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s;
+      margin: 100px auto 100px auto;
+    }
+
+    body.dark-mode .container {
+      background: var(--card-bg-dark);
+    }
+
+    .header-card {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #2196f3;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 30px;
+      font-weight: 600;
+      z-index: 998;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    label {
+      display: block;
+      margin-top: 16px;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    input[type="text"], textarea {
+      width: 98%;
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      margin: 6px 0 12px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    textarea {
+      height: 50px;
+    }
+
+    button[type="submit"] {
+      display: block;
+      margin: 20px auto 0;
+      width: 200px;
+      background: #2196f3;
+      color: white;
+      padding: 12px;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+      background: #0b7dda;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 999;
+    }
+
+    .output-box {
+      width: 100%;
+      max-width: 700px;
+      background: var(--card-bg-light);
+      padding: 20px;
+      margin: 20px auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s;
+    }
+
+    body.dark-mode .output-box {
+      background: var(--card-bg-dark);
+    }
+
+    .output-box h3 {
+      margin-bottom: 16px;
+      color: #2196f3;
+    }
+
+    .output-box ol {
+      padding-left: 20px;
+    }
+
+    .output-box li {
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    .output-box li strong {
+      color: #4caf50;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      padding: 10px;
+      background: #2c3e50;
+      color: white;
+      z-index: 997;
+      font-size: 13px;
+      border-radius: 12px 12px 0 0;
+    }
+
+    footer a {
+      color: #ffd700;
+      text-decoration: none;
+      margin: 0 4px;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="theme-toggle">
+    <button onclick="toggleTheme()">🌗</button>
+  </div>
+
+  <div class="header-card">
+    💬 AI Fitness Chat Assistant
+  </div>
+
+  <div class="container">
+    <form id="plannerForm" action="/recommendations" method="POST">
+      <label>Dietary Preferences:</label>
+      <input type="text" name="dietary_preferences" required>
+
+      <label>Fitness Goals:</label>
+      <input type="text" name="fitness_goals" required>
+
+      <label>Lifestyle Factors:</label>
+      <input type="text" name="lifestyle_factors" required>
+
+      <label>Dietary Restrictions:</label>
+      <input type="text" name="dietary_restrictions" required>
+
+      <label>Health Conditions:</label>
+      <input type="text" name="health_conditions" required>
+
+      <label>Your Query:</label>
+      <textarea name="user_query" required></textarea>
+
+      <button type="submit">🚀 Get AI Plan</button>
+    </form>
+  </div>
+
+
+  {% if recommendations %}
+  <div class="output-box">
+    <h3>📋 Personalized Recommendations</h3>
+    <div class="output-section">
+  <h4>🥗 Diet Recommendations</h4>
+  <ul>
+    {% for item in recommendations.diet_types %}
+    <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+
+  <h4>🏋️ Workout Options</h4>
+  <ul>
+    {% for item in recommendations.workouts %}
+    <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+
+  <h4>🍳 Breakfast Ideas</h4>
+  <ul>
+    {% for item in recommendations.breakfasts %}
+    <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+
+  <h4>🍽️ Dinner Options</h4>
+  <ul>
+    {% for item in recommendations.dinners %}
+    <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+
+  <h4>💡 Additional Tips</h4>
+  <ul>
+    {% for item in recommendations.additional_tips %}
+    <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+</div>
+  </div>
+  {% endif %}
+  
+  <footer>
+    Made with ❤️ by AI | <a href="#">Privacy</a> | <a href="#">Contact</a>
+  </footer>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle("dark-mode");
+    }
+  </script>
+</body>
+</html>
